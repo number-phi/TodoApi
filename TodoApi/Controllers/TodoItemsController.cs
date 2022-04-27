@@ -10,8 +10,13 @@ using TodoApi.Models;
 
 namespace TodoApi.Controllers
 {
+    /// <summary>
+    /// Todo Items API
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public class TodoItemsController : ControllerBase
     {
         private readonly TodoContext _context;
@@ -21,7 +26,12 @@ namespace TodoApi.Controllers
             _context = context;
         }
 
-        // GET: api/TodoItems
+        // GET: api/TodoItems        
+        /// <summary>
+        /// Get Todo Items List
+        /// </summary>
+        /// <returns>Todo Items List</returns>
+        /// <response code="200"></response>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
         {
@@ -29,6 +39,13 @@ namespace TodoApi.Controllers
         }
 
         // GET: api/TodoItems/5
+        /// <summary>
+        /// Get Todo Item
+        /// </summary>
+        /// <param name="id">Todo Identifier</param>
+        /// <returns>Todo Item</returns>
+        /// <response code="200"></response>
+        /// <response code="404">Todo Item Not Found</response>
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
         {
@@ -44,8 +61,26 @@ namespace TodoApi.Controllers
         }
 
         // PUT: api/TodoItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Rewrites Todo Item
+        /// </summary>
+        /// <param name="id">Todo Identifier</param>
+        /// <param name="todoItem"></param>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT /TodoItems/1
+        ///     {
+        ///        "id": 1,
+        ///        "name": "Item #1",
+        ///        "isComplete": true
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="204">Item Updated</response>
+        /// <response code="404">Todo Item Not Found</response>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
         {
             if (id != todoItem.Id)
@@ -71,12 +106,31 @@ namespace TodoApi.Controllers
                 }
             }
 
-            return Ok();
+            return NoContent();
+            //return Ok();
         }
 
         // POST: api/TodoItems
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Creates a TodoItem.
+        /// </summary>
+        /// 
+        /// <param name="item"></param>
+        /// <returns>A newly created TodoItem</returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /TodoItems
+        ///     {
+        ///        "id": 1,
+        ///        "name": "Item #1",
+        ///        "isComplete": true
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="201">Todo Item Created</response>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]        
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
         {
             _context.TodoItems.Add(todoItem);
@@ -87,7 +141,14 @@ namespace TodoApi.Controllers
         }
 
         // DELETE: api/TodoItems/5
+        /// <summary>
+        /// Deletes a TodoItem
+        /// </summary>
+        /// <param name="id">Todo Identifier</param>
+        /// <response code="204">Item Updated</response>
+        /// <response code="404">Todo Item Not Found</response>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteTodoItem(long id)
         {
             var todoItem = await _context.TodoItems.FindAsync(id);
@@ -99,7 +160,8 @@ namespace TodoApi.Controllers
             _context.TodoItems.Remove(todoItem);
             await _context.SaveChangesAsync();
 
-            return StatusCode(204, new { message = $"Todo Item {id} Deleted" });
+            //return StatusCode(204, new { message = $"Todo Item {id} Deleted" });
+            return NoContent();
         }
 
         private bool TodoItemExists(long id)
